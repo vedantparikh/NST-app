@@ -17,11 +17,6 @@ import altair as alt
 import tensorflow as tf
 from tensorflow.python.keras.preprocessing import image as kp_image
 from tensorflow.python.keras import models 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 import datetime
 
 img_dir = 'C:/Users/Vedant/NST-app/images/'
@@ -473,47 +468,6 @@ def run_style_transfer(content_path,
 
 if st.button('Start Training'):
     best, best_loss, imgs = run_style_transfer(content_path, style_path, num_iterations=num_iterations, content_weight=content_weight, style_weight=style_weight)
-
-# =============================================================================
-# Sending an E-mail
-# =============================================================================
-bestList = os.listdir(img_dir)
-if "best-image.jpg" in bestList:
-    email_user = "vdntparikh@gmail.com"
-    email_password = "Bubbly29!1234"
-    email_send = 'vedant.parikh@outlook.com'
-    
-    subject = 'Generated Image from Neural Style Transfer'
-    email_send = st.text_input('Please write your E-mail address', 'example@example.com')
-    msg = MIMEMultipart()
-    msg['From'] = email_user
-    msg['To'] = email_send
-    msg['Subject'] = subject
-    
-    body = 'Hi there, \n\nPlease find attached image as the best generated image. \n\nBest regards,\nVedant Parikh'
-    msg.attach(MIMEText(body,'plain'))
-    
-    filename = img_dir+'best-image.jpg'
-
-
-    # attachment  = open(filename,'rb')
-    with open(filename, 'rb') as img:
-        attachment = img
-        part = MIMEBase('application','octet-stream')
-        part.set_payload((attachment).read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition',"attachment; filename= "+filename[-14:])
-        
-        msg.attach(part)
-        text = msg.as_string()
-        server = smtplib.SMTP('smtp.gmail.com',587)
-        server.starttls()
-        server.login(email_user,email_password)
-        if st.button("Send results as an E-mail"):
-            server.sendmail(email_user,email_send,text)
-            server.quit()
-            plt.plot(np.zeros(10))
-            plt.savefig(img_dir + "best-image-jpg")
 
 # =============================================================================
 # Data Deletion and Celebration
