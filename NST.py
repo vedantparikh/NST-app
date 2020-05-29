@@ -17,15 +17,19 @@ import altair as alt
 import tensorflow as tf
 from tensorflow.python.keras.preprocessing import image as kp_image
 from tensorflow.python.keras import models 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 import datetime
 
-img_dir = 'C:/Users/Vedant/NST-app/images/'
+img_dir = '/Neural-Style-Transfer/images/'
 
+
+ContentImageNames123 = os.listdir(img_dir +  "contentImages/")
+StyleImageNames123 = os.listdir(img_dir +  "styleImages/")
+
+if "Your-Style-Image.jpg" in StyleImageNames123:
+    os.remove(img_dir +  "styleImages/" + "Your-Style-Image.jpg")
+
+if "Your-Content-Image.jpg" in ContentImageNames123:
+    os.remove(img_dir +  "contentImages/" + "Your-Content-Image.jpg")
 
 """## Neural Style Transfer
 In this post, I will be introducing a tool I developed based on an algorithm [**'Neural Style Transfer'**](https://arxiv.org/abs/1508.06576)!
@@ -201,7 +205,7 @@ Hence, we also need to normalize our input images as per the VGG16 model standar
 
 The below figure shows `model.summary()` of VGG16 model:
 """
-image = Image.open(img_dir + '/vgg16.png')
+image = Image.open('C:/Users/Vedant/Downloads/Neural Style Transfer/Neural-Style-Transfer/images/vgg16.png')
 st.image(image, caption='VGG16 Model Summary',use_column_width=True)
 
 """
@@ -254,9 +258,12 @@ num_style_layers = len(style_layers)
 def get_content_loss(base_content, target):
   return tf.reduce_mean(tf.square(base_content - target))
 
-st.sidebar.image(Image.open(selectedContentImage), caption="Content Image", width=200)
+content_sidebar = st.sidebar.empty()
+style_sidebar = st.sidebar.empty()
 
-st.sidebar.image(Image.open(selectedStyleImage), caption="Style Image", width=200)
+content_sidebar.image(Image.open(selectedContentImage), caption="Content Image", width=200)
+
+style_sidebar.image(Image.open(selectedStyleImage), caption="Style Image", width=200)
 
 """
 In NST the loss function is the summation of loss between input image with the content image (content loss)
@@ -475,47 +482,6 @@ if st.button('Start Training'):
     best, best_loss, imgs = run_style_transfer(content_path, style_path, num_iterations=num_iterations, content_weight=content_weight, style_weight=style_weight)
 
 # =============================================================================
-# Sending an E-mail
-# =============================================================================
-bestList = os.listdir(img_dir)
-if "best-image.jpg" in bestList:
-    email_user = "vdntparikh@gmail.com"
-    email_password = "Bubbly29!1234"
-    email_send = 'vedant.parikh@outlook.com'
-    
-    subject = 'Generated Image from Neural Style Transfer'
-    email_send = st.text_input('Please write your E-mail address', 'example@example.com')
-    msg = MIMEMultipart()
-    msg['From'] = email_user
-    msg['To'] = email_send
-    msg['Subject'] = subject
-    
-    body = 'Hi there, \n\nPlease find attached image as the best generated image. \n\nBest regards,\nVedant Parikh'
-    msg.attach(MIMEText(body,'plain'))
-    
-    filename = img_dir+'best-image.jpg'
-
-
-    # attachment  = open(filename,'rb')
-    with open(filename, 'rb') as img:
-        attachment = img
-        part = MIMEBase('application','octet-stream')
-        part.set_payload((attachment).read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition',"attachment; filename= "+filename[-14:])
-        
-        msg.attach(part)
-        text = msg.as_string()
-        server = smtplib.SMTP('smtp.gmail.com',587)
-        server.starttls()
-        server.login(email_user,email_password)
-        if st.button("Send results as an E-mail"):
-            server.sendmail(email_user,email_send,text)
-            server.quit()
-            plt.plot(np.zeros(10))
-            plt.savefig(img_dir + "best-image-jpg")
-
-# =============================================================================
 # Data Deletion and Celebration
 # =============================================================================
     
@@ -524,8 +490,10 @@ if len(aa) != 0 or len(bb) != 0:
     if vv:
         if len(bb) != 0:
             os.remove(img_dir + "styleImages/"+ "Your-Style-Image.jpg")
+            style_sidebar.image(Image.open(img_dir + "styleImages/"+ "Waves.jpg"), caption="Content Image", width=200)
         if len(aa) != 0:
             os.remove(img_dir + "contentImages/" + "Your-Content-Image.jpg")
+            style_sidebar.image(Image.open(img_dir + "contentImages/"+ "Walhalla-Regensburg.jpg"), caption="Content Image", width=200)
 
 st.markdown("## Party time!")
 st.write("Yay! You're done with this Training and Generation of NST image. Click below to celebrate.")
