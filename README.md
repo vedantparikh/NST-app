@@ -1,4 +1,4 @@
-# NST-Static-App
+# nstapp121
 Static Neural Style Transfer App with Streamlit
 
 # Required Files
