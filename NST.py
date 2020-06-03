@@ -19,17 +19,14 @@ from tensorflow.python.keras.preprocessing import image as kp_image
 from tensorflow.python.keras import models 
 import datetime
 
-img_dir = '/Neural-Style-Transfer/images/'
 
+# If previous User forgot to delete his data
+ImageNames123 = os.listdir()
+if "Your-Style-Image.jpg" in ImageNames123:
+    os.remove("Your-Style-Image.jpg")
 
-ContentImageNames123 = os.listdir(img_dir +  "contentImages/")
-StyleImageNames123 = os.listdir(img_dir +  "styleImages/")
-
-if "Your-Style-Image.jpg" in StyleImageNames123:
-    os.remove(img_dir +  "styleImages/" + "Your-Style-Image.jpg")
-
-if "Your-Content-Image.jpg" in ContentImageNames123:
-    os.remove(img_dir +  "contentImages/" + "Your-Content-Image.jpg")
+if "Your-Content-Image.jpg" in ImageNames123:
+    os.remove("Your-Content-Image.jpg")
 
 """## Neural Style Transfer
 In this post, I will be introducing a tool I developed based on an algorithm [**'Neural Style Transfer'**](https://arxiv.org/abs/1508.06576)!
@@ -48,7 +45,7 @@ taken digitally somewhere in Austria and the style image ([**Starry Night**](htt
 know how would it look like? The below image shows it would look something like this.  
 
 """
-st.image(Image.open(img_dir+"linkedin.jpg"), width=512)
+st.image(Image.open("linkedin.jpg"), width=512)
 
 
 def returnNotMatches(a, b):
@@ -71,14 +68,14 @@ uploaded_file = st.file_uploader("Choose a Content Image file", type=["jpg","jpe
 if uploaded_file is not None:
     data = Image.open(uploaded_file)
     data = data.convert("RGB")
-    data.save( img_dir + "ContentImages/"+'Your-Content-Image.jpg')
+    data.save('Your-Content-Image.jpg')
     # st.image(data, use_column_width=True)
 
 uploaded_file1 = st.file_uploader("Choose a Style Image file", type=["jpg","jpeg","png", "JPEG"])
 if uploaded_file1 is not None:
     data1 = Image.open(uploaded_file1)
     data1 = data1.convert("RGB")
-    data1.save( img_dir + "styleImages/"+'Your-Style-Image.jpg')
+    data1.save('Your-Style-Image.jpg')
     # st.image(data, use_column_width=True)
     st.empty()
 
@@ -86,29 +83,31 @@ if uploaded_file1 is not None:
 # Dropdown list of Style and Content Image
 # =============================================================================
 
-contentImageNames = os.listdir(img_dir+'contentImages/')
-
-# @st.cache()
-contentImageNames111 = ["House-in-Austria.jpg", "Walhalla-Regensburg.jpg", "River.JPG", "King-of-Walhalla.JPG",
+ImageNames123 = os.listdir()
+# st.write(ImageNames123)
+contentImageNames = ["House-in-Austria.jpg", "River.JPG", "King-of-Walhalla.JPG",
                         "River-Bridge-Path.JPG", "River-Bridge-Tree.JPG", "Riverfront.JPG", "Riverfront-Cycle.JPG",
-                        "Tree-Springs.JPG", "Tree-Springs1.JPG", "View-From-Walhalla.JPG"]
-aa = returnNotMatches(contentImageNames, contentImageNames111)
-# aa = list(set(contentImageNames).difference(set(contentImageNames111)))
+                        "Tree-Springs.JPG", "Tree-Springs1.JPG", "View-From-Walhalla.JPG", "Walhalla-Regensburg.jpg"]
 
+if "Your-Content-Image.jpg" in ImageNames123:
+    contentImageNames = ["House-in-Austria.jpg", "River.JPG", "King-of-Walhalla.JPG",
+                        "River-Bridge-Path.JPG", "River-Bridge-Tree.JPG", "Riverfront.JPG", "Riverfront-Cycle.JPG",
+                        "Tree-Springs.JPG", "Tree-Springs1.JPG", "View-From-Walhalla.JPG", "Walhalla-Regensburg.jpg", "Your-Content-Image.jpg"]
+else:
+    pass
 contentImage = st.selectbox("Please Select a Content Picture", contentImageNames, len(contentImageNames)-1)
-selectedContentImage = img_dir + "contentImages/" + contentImage
-# st.image(Image.open(selectedContentImage), caption=contentImage, use_column_width=True)
+selectedContentImage = contentImage
 
+styleImageNames = ["La-Mousme.jpg", "Self-Potrait.jpg", "Starry-Night.jpg", "Tuebingen-Neckarfront.jpg",
+      "Vassily-Kandinsky.jpg", "Starry-Night-Over-the-Rhone.jpg","Style-Art-Image.jpg", "Waves.jpg"]
 
-styleImageNames = os.listdir(img_dir+'styleImages/')
-styleImageNames111 = ["La-Mousme.jpg", "Self-Potrait.jpg", "Starry-Night.jpg", "Tuebingen-Neckarfront.jpg",
-      "Vassily-Kandinsky.jpg", "Waves.jpg", "Starry-Night-Over-the-Rhone.jpg","Style-Art-Image.jpg"]
-bb = list(set(styleImageNames).difference(set(styleImageNames111)))
-
-
+if "Your-Style-Image.jpg" in ImageNames123:
+    styleImageNames = ["La-Mousme.jpg", "Self-Potrait.jpg", "Starry-Night.jpg", "Tuebingen-Neckarfront.jpg",
+      "Vassily-Kandinsky.jpg", "Starry-Night-Over-the-Rhone.jpg","Style-Art-Image.jpg", "Waves.jpg", "Your-Style-Image.jpg"]
+else:
+    pass
 styleImage = st.selectbox("Please Select a Style Picture", styleImageNames, len(styleImageNames)-1)
-selectedStyleImage = img_dir + "styleImages/"+ styleImage
-# st.image(Image.open(selectedStyleImage), caption=styleImage, use_column_width=True)
+selectedStyleImage = styleImage
 
 # Set up some global values here
 content_path = selectedContentImage
@@ -205,7 +204,7 @@ Hence, we also need to normalize our input images as per the VGG16 model standar
 
 The below figure shows `model.summary()` of VGG16 model:
 """
-image = Image.open('C:/Users/Vedant/Downloads/Neural Style Transfer/Neural-Style-Transfer/images/vgg16.png')
+image = Image.open('vgg16.png')
 st.image(image, caption='VGG16 Model Summary',use_column_width=True)
 
 """
@@ -470,7 +469,7 @@ def run_style_transfer(content_path,
   st.write("The **Best Image** generated after the training is below. (Best Image: Image which has minimum **Loss** value.")
   st.image(best_img, caption="Best Image!")
   im222 = Image.fromarray(best_img)
-  im222.save(img_dir+'best-image.jpg')
+  im222.save('best-image.jpg')
   time_placeholder.markdown('Total training time: {}'.format(str(datetime.timedelta(seconds=(time.time() - global_start)))[:-7]))
 
   return best_img, best_loss, imgs
@@ -484,16 +483,17 @@ if st.button('Start Training'):
 # =============================================================================
 # Data Deletion and Celebration
 # =============================================================================
-    
-if len(aa) != 0 or len(bb) != 0:
+if "Your-Content-Image.jpg" in ImageNames123 or "Your-Style-Image.jpg" in ImageNames123:
     vv = st.button("Delete Data")
     if vv:
-        if len(bb) != 0:
-            os.remove(img_dir + "styleImages/"+ "Your-Style-Image.jpg")
-            style_sidebar.image(Image.open(img_dir + "styleImages/"+ "Waves.jpg"), caption="Content Image", width=200)
-        if len(aa) != 0:
-            os.remove(img_dir + "contentImages/" + "Your-Content-Image.jpg")
-            style_sidebar.image(Image.open(img_dir + "contentImages/"+ "Walhalla-Regensburg.jpg"), caption="Content Image", width=200)
+        if "Your-Style-Image.jpg" in ImageNames123:
+            os.remove("Your-Style-Image.jpg")
+            style_sidebar.image(Image.open("Waves.jpg"), caption="Content Image", width=200)
+        if "Your-Content-Image.jpg" in ImageNames123:
+            os.remove("Your-Content-Image.jpg")
+            content_sidebar.image(Image.open("Walhalla-Regensburg.jpg"), caption="Content Image", width=200)
+        if "best-image.jpg" in ImageNames123:
+            os.remove("best-image.jpg")
 
 st.markdown("## Party time!")
 st.write("Yay! You're done with this Training and Generation of NST image. Click below to celebrate.")
