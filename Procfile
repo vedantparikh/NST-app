@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run NST.py
+web: sh setup.sh && streamlit run nst.py
